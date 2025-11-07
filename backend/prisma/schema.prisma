@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Facility {
+  id        String     @id @default(cuid())
+  name      String
+  location  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  buildings Building[]
+  assets    Asset[]
+}
+
+model Building {
+  id          String  @id @default(cuid())
+  name        String
+  facilityId  String  @map("facility_id")
+  facility    Facility @relation(fields: [facilityId], references: [id])
+  floors      Floor[]
+  assets      Asset[]
+}
+
+model Floor {
+  id         String  @id @default(cuid())
+  number     Int
+  buildingId String
+  building   Building  @relation(fields: [buildingId], references: [id])
+  departments Department[]
+  assets      Asset[]
+}
+
+model Department {
+  id       String  @id @default(cuid())
+  name     String
+  floorId  String
+  floor    Floor   @relation(fields: [floorId], references: [id])
+  rooms    Room[]
+  assets   Asset[]
+}
+
+model Room {
+  id            String  @id @default(cuid())
+  name          String
+  departmentId  String
+  department    Department @relation(fields: [departmentId], references: [id])
+  assets        Asset[]
+}
+
+model AssetCategory {
+  id           String @id @default(cuid())
+  name         String
+  description  String?
+  assets       Asset[]
+}
+
+model CriticalityLevel {
+  id          String @id @default(cuid())
+  name        String
+  code        String
+  description String?
+  assets      Asset[]
+}
+
+model Asset {
+  id                String   @id @default(cuid())
+  code              String
+  name              String
+  categoryId        String
+  criticalityId     String
+  manufacturer      String?
+  model             String?
+  serialNumber      String?
+  purchaseDate      DateTime?
+  installationDate  DateTime?
+  warrantyExpiresAt DateTime?
+  purchaseCost      Float?
+  specifications    Json?
+  facilityId        String
+  buildingId        String?
+  floorId           String?
+  departmentId      String?
+  roomId            String?
+
+  category        AssetCategory    @relation(fields: [categoryId], references: [id])
+  criticality     CriticalityLevel @relation(fields: [criticalityId], references: [id])
+  facility        Facility         @relation(fields: [facilityId], references: [id])
+  building        Building?        @relation(fields: [buildingId], references: [id])
+  floor           Floor?           @relation(fields: [floorId], references: [id])
+  department      Department?      @relation(fields: [departmentId], references: [id])
+  room            Room?            @relation(fields: [roomId], references: [id])
+}

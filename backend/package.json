@@ -1,0 +1,9 @@
+{
+  "name": "facilityflow-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prisma:migrate": "npx prisma migrate dev --name init",
+    "prisma:studio": "npx prisma studio"
+  }
+}
